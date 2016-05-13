@@ -17,3 +17,6 @@ patients <- c( 86, 93, 136, 82 )
 prop.test(smokers, patients)
 
 
+pwr.2p.test(h = ES.h(0.04,0.05), n = NULL, sig.level = 0.05, power = 0.8)
+
+pwr.2p2n.test(h = ES.h(0.04,0.05), n1 = 300000, sig.level = 0.05, power = 0.8)
