@@ -1,22 +1,10 @@
-library(pwr)
+library(purrr)
 
-#T test sample size
-#pwr.t.test(n=11165, sig.level = 0.95, power = 0.8)
+mtcars %>% split(.$cyl) %>%
+  map(~lm(mpg~wt, data=.)) %>%
+  map(summary) %>%
+  map("df") %>%
+  map("[1]")
 
-#prop test sample size
-pwr.2p.test(h=ES.h(0.04,0.05), sig.level = 0.05, power = 0.8)
-
-power.prop.test(p1=0.04, p2=0.05, sig.level=0.05, power = 0.95, alternative="two.sided")
-
-#running prop test
-prop.test(20, 50, 0.3)
-prop.test(200, 500, 0.3)
-
-smokers  <- c( 83, 90, 129, 70 )
-patients <- c( 86, 93, 136, 82 )
-prop.test(smokers, patients)
-
-
-pwr.2p.test(h = ES.h(0.04,0.05), n = NULL, sig.level = 0.05, power = 0.8)
-
-pwr.2p2n.test(h = ES.h(0.04,0.05), n1 = 300000, sig.level = 0.05, power = 0.8)
+1:10 %>%
+  keep(x > 2)
