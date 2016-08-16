@@ -8,6 +8,7 @@ library(scales)
 library(stringr)
 library(tidytext)
 library(broom)
+library(Cairo)
 
 theme_set(theme_bw())
 options(tibble.width = Inf)
@@ -139,4 +140,37 @@ android_iphone_ratios %>%
   labs(x = "", y = "Android/iPhone log ratio") + 
   scale_fill_manual(name = "", labels = c("Android", "iPhone"), 
                      values = c("red", "lightblue"))
+
+# Is trump getting angrier over time
+
+words_filtered = tweet_words %>%
+  filter(source == "Android") %>%
+  inner_join(nrc, by = "word") %>%
+  mutate(created = week(created))
+
+weekly_totals = tweet_words %>%
+  filter(source == "Android") %>%
+  mutate(created = week(created)) %>%
+  group_by(created) %>%
+  summarize(TotalWords = n())
+
+weekly_sentiment =  words_filtered %>% 
+  count(created, sentiment) %>%
+  ungroup() %>%
+  inner_join(weekly_totals, by = "created") %>%
+  filter(TotalWords >= 20) %>%
+  mutate(SentimentProp = n/TotalWords)
+
+CairoPNG(file = "Plots/TrumpTweets.png", width = 800, height = 600)
+weekly_sentiment %>%
+  mutate(Date = as.POSIXct(paste0("2016-", created * 7), format="%Y-%j")) %>%
+  ggplot(aes(Date, SentimentProp, fill = "red")) + 
+#  geom_line() + 
+  geom_smooth(se = FALSE) + 
+  facet_wrap(~sentiment, nrow = 2) + 
+  theme(legend.position = "none") + 
+  labs(y = "Proportion of sentiment in tweets by week", x = "") +
+  theme(strip.text.x = element_text(size = 12))
+dev.off()
+
   
