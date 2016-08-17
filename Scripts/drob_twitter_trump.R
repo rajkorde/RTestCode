@@ -13,10 +13,10 @@ library(Cairo)
 theme_set(theme_bw())
 options(tibble.width = Inf)
 
-consumerKey = "0RgrnAZ9wsdQaSbngpzsNvUwh"
-consumerSecret = "UHUZXy43SoE7y8COSLm8k9fkd6AV13QKSWXEoYlAFmlGESLZIm"
-accessToken = "2732354256-xCXzZeczCMX32427KU9pV7mhPAul1wIZlVfAF1A"
-accessTokenSecret = "zR7j7yKN0rps5DJAxIh4zSUi2bMvu91iIWoPSV0Hs2X6K"
+consumerKey = "***"
+consumerSecret = "***"
+accessToken = "***"
+accessTokenSecret = "***"
 
 setup_twitter_oauth(consumerKey, consumerSecret, accessToken, accessTokenSecret)
 
@@ -141,7 +141,7 @@ android_iphone_ratios %>%
   scale_fill_manual(name = "", labels = c("Android", "iPhone"), 
                      values = c("red", "lightblue"))
 
-# Is trump getting angrier over time
+# Trump tweet sentiments over time
 
 words_filtered = tweet_words %>%
   filter(source == "Android") %>%
@@ -165,7 +165,6 @@ CairoPNG(file = "Plots/TrumpTweets.png", width = 800, height = 600)
 weekly_sentiment %>%
   mutate(Date = as.POSIXct(paste0("2016-", created * 7), format="%Y-%j")) %>%
   ggplot(aes(Date, SentimentProp, fill = "red")) + 
-#  geom_line() + 
   geom_smooth(se = FALSE) + 
   facet_wrap(~sentiment, nrow = 2) + 
   theme(legend.position = "none") + 
