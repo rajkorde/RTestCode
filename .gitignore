@@ -20,3 +20,6 @@ vignettes/*.pdf
 .Rproj.user
 *.tar
 *.json
+*.txt
+*.bin
+*.zip
