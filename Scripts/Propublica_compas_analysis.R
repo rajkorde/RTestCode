@@ -76,6 +76,10 @@ NagelkerkeR2(model)
 
 control <- exp(-1.52554) / (1+ exp(-1.52554))
 exp(0.47721) / (1-control + control * exp(0.47721))
+#Black defendants are 45% more likely than white defendants to receive a 
+#higher score correcting for the seriousness of their crime, previous arrests, 
+#and future criminal behavior.
+
 exp(0.22127) / (1 - control + (control * exp(0.22127)))
 exp(1.30839) / (1 - control + (control * exp(1.30839)))
 

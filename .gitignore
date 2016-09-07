@@ -24,3 +24,5 @@ vignettes/*.pdf
 *.bin
 *.zip
 *.csv
+*.xlsx
+*.png

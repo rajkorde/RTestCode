@@ -1,3 +1,29 @@
+
+
+prob <- seq(.01, .99, length = 100)
+
+odds <- prob/(1-prob)
+logodds <- log(prob/(1-prob))
+
+d <- data.frame(prob = prob, odds = odds, logodds = logodds)
+
+ggplot(d, aes(prob, logodds)) + geom_line()
+ggplot(d, aes(prob, odds)) + geom_line()
+
+d <- mtcars
+
+d$mpgfac <- ifelse(d$mpg < 20, 0, 1)
+
+table(d$mpgfac)
+p = 14/32
+
+log(p/(1-p))
+
+glm0 <- glm(mpgfac~1, d, family = binomial(link = "logit"))
+
+
+#####
+
 N  <- 100               # generate some data
 X1 <- rnorm(N, 175, 7)
 X2 <- rnorm(N,  30, 8)
@@ -188,6 +214,34 @@ glmcont = glm(hon ~ math, d, family = binomial(link = "logit"))
 
 #intercept gives the log odds of a student with math score zero
 #one unit increase in math score increases the log offs by .1563404
-
+#odds(math=55)/odds(math=54) = exp(.1563404) = 1.1692241.
+# Estimate Std. Error z value Pr(>|z|)    
+# (Intercept) -9.79394    1.48174  -6.610 3.85e-11 ***
+#   math         0.15634    0.02561   6.105 1.03e-09 ***
 
 #LR with multiple predictor variables and no interaction terms
+glmcont = glm(hon ~ math + female + read, d, 
+              family = binomial(link = "logit"))
+#This fitted model says that, holding math and reading at a fixed value, the 
+#odds of getting into an honors class for females (female = 1)over the odds of 
+#getting into an honors class for males (female = 0) is exp(.979948) = 2.66.  
+#In terms of percent change, we can say that the odds for females are 166% 
+#higher than the odds for males.  The coefficient for math says that, holding 
+#female and reading at a fixed value, we will see 13% increase in the odds of 
+#getting into an honors class for a one-unit increase in math score since 
+#exp(.1229589) = 1.13.
+
+#LR with an interaction term
+glmcont = glm(hon ~ math + female + female*math, d, 
+              family = binomial(link = "logit"))
+
+#In the presence of interaction term of female by math, we can no longer 
+#talk about the effect of female, holding all other variables at certain value, 
+#since it does not make sense to fix math and femalexmath at certain value and 
+#still allow female change from 0 to 1!
+# we contruct two equations, one for males and one for females
+#So we can say that the coefficient for math is the effect of math when 
+#female = 0.  More explicitly, we can say that for male students, 
+#a one-unit increase in math score yields a change in log odds of 0.13.  
+#On the other hand, for the female students, a one-unit increase in math score 
+#yields a change in log odds of (.13 + .067) = 0.197.
