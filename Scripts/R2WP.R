@@ -2,7 +2,7 @@ library(RWordPress)
 library(knitr)
 
 
-options(WordpressLogin = c(rajkorde = '6jefBSr3Cd(mOA&r*N#TlovG'),
+options(WordpressLogin = c(rajkorde = '***'),
         WordpressURL = 'http://significantdigits.org/xmlrpc.php')
 #        WordPressURL = 'https://blog_url/xmlrpc.php')
 
