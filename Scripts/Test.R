@@ -1,1 +1,0 @@
-raw = read.table(file = "Data/Temp/train-cif.txt", sep = ";")
