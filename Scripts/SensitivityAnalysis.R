@@ -1,3 +1,5 @@
+options(scipen = 9999)
+
 loadings <- matrix(c (
   .33, .58, .00, .00,  # Ease of Making Reservation 
   .35, .55, .00, .00,  # Availability of Preferred Seats
@@ -100,3 +102,46 @@ ols.fly<-lm(Fly_Again ~ Easy_Reservation + Preferred_Seats +
               Overhead_Storage + Clean_Aircraft + Courtesy + Friendliness + 
               Helpfulness + Service, data=scaled_ratings)
 summary(ols.fly)
+
+
+# find the important variables
+rec <- lm(Recommend ~ Easy_Reservation + Preferred_Seats + Flight_Options + 
+            Ticket_Prices + Seat_Comfort + Seat_Roominess + Overhead_Storage + Clean_Aircraft + 
+            Courtesy + Friendliness + Helpfulness + Service, data = scaled_ratings)
+summary(rec)
+
+
+
+grec <- glm(Recommend ~ Easy_Reservation + Preferred_Seats + Flight_Options + 
+            Ticket_Prices + Seat_Comfort + Seat_Roominess + Overhead_Storage + Clean_Aircraft + 
+            Courtesy + Friendliness + Helpfulness + Service, data = scaled_ratings)
+summary(grec)
+
+scaled_ratings$BRec <- ifelse(scaled_ratings$Recommend > 0 , TRUE, FALSE)
+
+grec <- glm(BRec ~ Easy_Reservation + Preferred_Seats + Flight_Options + 
+              Ticket_Prices + Seat_Comfort + Seat_Roominess + Overhead_Storage + Clean_Aircraft + 
+              Courtesy + Friendliness + Helpfulness + Service, data = scaled_ratings)
+summary(grec)
+
+library(relaimpo)
+
+rel <- calc.relimp(rec, type = c("lmg"), rela = TRUE, rank = TRUE)
+x <- data.frame(rec$coefficients)
+x$names <-  row.names(x)
+ggplot(x, aes(x = names, y = rec.coefficients)) + geom_bar(stat = "identity") +
+  coord_flip()
+
+library(coefplot)
+coefplot(rec, intercept = FALSE, sort = "magnitude")
+
+#glm
+grel <- calc.relimp(grec, type = c("lmg"), rela = TRUE, rank = TRUE)
+plot(grel)
+x <- data.frame(grec$coefficients)
+x$names <-  row.names(x)
+ggplot(dplyr::filter(x, names != "(Intercept)"), aes(x = names, y = grec.coefficients)) + geom_bar(stat = "identity") +
+  coord_flip()
+
+library(coefplot)
+coefplot(rec, intercept = FALSE, sort = "magnitude")
