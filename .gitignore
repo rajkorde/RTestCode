@@ -26,3 +26,5 @@ vignettes/*.pdf
 *.csv
 *.xlsx
 *.png
+*.Rdata
+*.model
