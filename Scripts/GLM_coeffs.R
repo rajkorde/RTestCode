@@ -245,3 +245,105 @@ glmcont = glm(hon ~ math + female + female*math, d,
 #a one-unit increase in math score yields a change in log odds of 0.13.  
 #On the other hand, for the female students, a one-unit increase in math score 
 #yields a change in log odds of (.13 + .067) = 0.197.
+
+
+### dominance analysis etc?
+
+set.seed(1)
+N  <- 10000               # generate some data
+X1 <- rnorm(N, 175, 7)
+X2 <- rnorm(N,  30, 8)
+X3 <- abs(rnorm(N, 60, 30))
+Y  <- 0.5*X1 - 0.3*X2 - 0.4*X3 + 10 + rnorm(N, 0, 12)
+Yfac   <- cut(Y, breaks=c(-Inf, median(Y), Inf), labels=c("lo", "hi"))
+Yfacint <- ifelse(Yfac == "hi", 1, 0)
+
+lmfit0 <- lm(Y ~ X1 + X2 + X3)
+summary(lmfit0)
+lmfit <- lm(Yfacint ~ X1 + X2 + X3)
+
+
+glmFit <- glm(Y ~ X1 + X2 + X3)
+glmFit <- glm(Yfac ~ X1 + X2 + X3, family=binomial(link="logit"))
+
+
+
+
+# just one variable
+N  <- 10000  
+set.seed(1)
+X1 <- rnorm(N, 175, 7)
+Y  <- 0.5*X1 + 10 + rnorm(N, 0, 12)
+cor(Y, X1)
+lmfit <- lm(Y ~ X1)
+summary(lmfit)
+c <- cor(X1, Y)
+c^2 # same as R^2
+
+
+#two uncorrelated variables
+
+N  <- 10000 # generate some data
+set.seed(1)
+X1 <- rnorm(N, 175, 7)
+X2 <- rnorm(N,  30, 8)
+Y  <- 0.5*X1  - 0.3*X2 + 10 + rnorm(N, 0, 12)
+(c1 <- cor(Y, X1))
+(c2 <- cor(Y, X2))
+cor(X1, X2) #almost zero
+lmfit <- lm(Y ~ X1 + X2)
+summary(lmfit)
+(c1^2) + (c2^2) #same as R2
+vif(lmfit)
+
+#two mutually correlated variables
+
+#correlated case
+N  <- 10000   
+set.seed(1)
+X1 <- rnorm(N, 175, 7)
+X2 <- X1 * 0.8 + rnorm(N, 0, 5)
+cor(X2, X1)
+#plot(X2, X1)
+#X3 <- rnorm(N, 60, 30)
+Y  <- 0.5*X1 - 0.3*X2 + 10 + rnorm(N, 0, 12)
+lmfit <- lm(Y ~ X1 + X2)
+summary(lmfit) #std error is higher because variance is inflated
+cor(X1, Y)^2 + cor(X2, Y)^2 #not same as R2
+vif(lmfit) #why is this higher than 1?
+
+#multicollinearity
+N  <- 10000   
+set.seed(1)
+X1 <- rnorm(N, 175, 7)
+X2 <- X1 * 0.8 + rnorm(N, 0, 5)
+Y <- X2 * 2 + rnorm(N, 0, 15)
+cor(Y, X1)
+cor(X1, X2)
+cor(Y, X2)
+lmfit <- lm(Y ~ X2 + X1)
+summary(lmfit) #X2 suppressed 
+cor(X1, Y)^2 + cor(X2, Y)^2 #not same as R2
+library(car)
+vif(lmfit) #between 5 and 10 indicates high correlation, some say even 2.5 is bad
+sqrt(vif(lmfit)) 
+
+# data with factors
+set.seed(1)
+N  <- 10000               # generate some data
+X1 <- rnorm(N, 175, 7)
+X2 <- rnorm(N,  30, 8)
+X3 <- abs(rnorm(N, 60, 30))
+X3fac <- cut(X3, breaks=c(-Inf, quantile(X3, c(0.25, 0.5, 0.75)), Inf), 
+             labels=c("vlo", "lo", "hi", "vhi"))
+Y  <- 0.5*X1 - 0.3*X2 - 1.0 * as.numeric(X3fac) + 10 + rnorm(N, 0, 12)
+lmfit <- lm(Y ~ X1 + X2 + X3fac)
+summary(lmfit)
+vif(lmfit)
+
+X3fac2 <- relevel(X3fac, ref = "hi")
+Y  <- 0.5*X1 - 0.3*X2 - 1.0 * as.numeric(X3fac2) + 10 + rnorm(N, 0, 12)
+lmfit <- lm(Y ~ X1 + X2 + X3fac2)
+summary(lmfit)
+vif(lmfit)
+plot(X3fac2, Y)
