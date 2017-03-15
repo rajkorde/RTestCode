@@ -347,3 +347,48 @@ lmfit <- lm(Y ~ X1 + X2 + X3fac2)
 summary(lmfit)
 vif(lmfit)
 plot(X3fac2, Y)
+
+
+## TODO: try scaling the weights
+
+#TODO: product measure uncorrelated case
+
+N  <- 10000 # generate some data
+set.seed(1)
+X1 <- rnorm(N, 175, 7)
+X2 <- rnorm(N,  30, 8)
+Y  <- 0.5*X1  - 0.3*X2 + 10 + rnorm(N, 0, 12)
+(c1 <- cor(Y, X1))
+(c2 <- cor(Y, X2))
+cor(X1, X2) #almost zero
+lmfit <- lm(Y ~ X1 + X2)
+lmfit <- lm(Y ~ scale(X1) + scale(X2))
+summary(lmfit)
+(c1^2) + (c2^2) #same as R2
+
+vif(lmfit)
+
+
+#Suppression
+set.seed(888)                            # for reproducibility
+
+S  =         rnorm(60, mean=0, sd=1.0)   # the Suppressor is normally distributed
+U  = 1.1*S + rnorm(60, mean=0, sd=0.1)   # U (unrelated) is Suppressor plus error
+R  =         rnorm(60, mean=0, sd=1.0)   # related part; normally distributed
+OV = U + R                               # the Other Variable is U plus R
+Y  = R +     rnorm(60, mean=0, sd=2)     # Y is R plus error
+
+cor.test(S, Y)                           # Suppressor uncorrelated w/ Y
+# t = 0.0283, df = 58, p-value = 0.9775
+# cor 0.003721616 
+
+cor.test(S, OV)                          # Suppressor correlated w/ Other Variable
+# t = 8.655, df = 58, p-value = 4.939e-12
+# cor 0.7507423
+
+cor.test(OV,Y)                           # Other Var not significantly cor w/ Y
+# t = 1.954, df = 58, p-value = 0.05553
+# cor 0.2485251
+
+summary(lm(Y~OV+S))
+

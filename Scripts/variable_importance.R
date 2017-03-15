@@ -81,4 +81,3 @@ iv <- iv.mult(german_data, y="gb", summary=FALSE, verbose=TRUE)
 iv.plot.summary(iv_df)
 
 german_data_iv <- iv.replace.woe(german_data, iv, verbose=TRUE)  # add woe variables to original data frame.
-plot(german_data_iv)
