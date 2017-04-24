@@ -304,6 +304,8 @@ set.seed(1)
 X1 <- rnorm(N, 175, 7)
 X2 <- X1 * 0.8 + rnorm(N, 0, 5)
 cor(X2, X1)
+cor(Y, X1)
+cor(X2, Y)
 #plot(X2, X1)
 #X3 <- rnorm(N, 60, 30)
 Y  <- 0.5*X1 - 0.3*X2 + 10 + rnorm(N, 0, 12)
@@ -392,3 +394,97 @@ cor.test(OV,Y)                           # Other Var not significantly cor w/ Y
 
 summary(lm(Y~OV+S))
 
+
+#yhat
+
+library(MBESS)
+library(yhat)
+data(HS.data)
+
+apsOut <- aps(HS.data, "paragrap", list("general", "sentence", "wordc"))
+commonality(apsOut)
+
+
+lmfit <- lm(paragrap ~ general + sentence + wordc, data = HS.data)
+regrOut <- calc.yhat(lmfit)
+
+
+library(boot)
+boot.out <- boot(HS.data, boot.yhat, 100, lmOut = lmfit, regrout0 = regrOut)
+result <- booteval.yhat(regrOut, boot.out, bty="perc")
+
+attach(HS.data)
+## Create canonical variable sets
+MATH_REASON<-HS.data[,c("deduct","problemr")]
+MATH_FUND<-HS.data[,c("numeric","arithmet","addition")]
+## Perform Commonality Coefficient Analysis
+canonCommonData<-canonCommonality(MATH_FUND,MATH_REASON,1)
+
+commonalityCoefficients(HS.data,"paragrap",list("general", "sentence","wordc"))
+
+#dominance analysis
+domOut <- dominance(apsOut)
+## Dominance analysis
+dombin(domOut)
+
+effect.size(lmfit)
+
+regr(lmfit)
+
+rwlOut<-rlw(HS.data,"paragrap",c("general","sentence","wordc"))
+
+#testing with my dataset
+N  <- 10000 # generate some data
+set.seed(1)
+X1 <- rnorm(N, 175, 7)
+X2 <- rnorm(N,  30, 8)
+Y  <- 0.5*X1  - 0.3*X2 + 10 + rnorm(N, 0, 12)
+(c1 <- cor(Y, X1))
+(c2 <- cor(Y, X2))
+cor(X1, X2) #almost zero
+lmfit <- lm(Y ~ X1 + X2)
+#lmfit <- lm(Y ~ scale(X1) + scale(X2))
+summary(lmfit)
+(c1^2) + (c2^2) #same as R2
+sum(lmfit$coefficients[-1] * c(c1, c2)) #should be same as R2
+calc.yhat(lmfit)
+library(QuantPsyc)
+lm.beta(lmfit)
+
+
+N  <- 10000   
+set.seed(1)
+X1 <- rnorm(N, 175, 7)
+X2 <- X1 * 0.8 + rnorm(N, 0, 5)
+Y <- X2 * 2 + rnorm(N, 0, 15)
+cor(Y, X1)
+cor(X1, X2)
+cor(Y, X2)
+lmfit <- lm(Y ~ X2 + X1)
+summary(lmfit) #X2 suppressed 
+cor(X1, Y)^2 + cor(X2, Y)^2 #not same as R2
+library(car)
+vif(lmfit) #between 5 and 10 indicates high correlation, some say even 2.5 is bad
+sqrt(vif(lmfit)) 
+calc.yhat(lmfit)
+
+#does calc.yhat work with glm
+set.seed(1)
+N  <- 10000               # generate some data
+X1 <- rnorm(N, 175, 7)
+X2 <- rnorm(N,  30, 8)
+X3 <- abs(rnorm(N, 60, 30))
+Y  <- 0.5*X1 - 0.3*X2 - 0.4*X3 + 10 + rnorm(N, 0, 12)
+Yfac   <- cut(Y, breaks=c(-Inf, median(Y), Inf), labels=c("lo", "hi"))
+Yfacint <- ifelse(Yfac == "hi", 1, 0)
+Yfaclog <- ifelse(Yfac == "hi", TRUE, FALSE)
+
+
+glmfit <- glm(Yfaclog ~ X1 + X2 + X3, family=binomial(link="logit"))
+summary(glmfit)
+
+library(car)
+vif(glmfit) #between 5 and 10 indicates high correlation, some say even 2.5 is bad
+sqrt(vif(glmfit)) 
+calc.yhat(glmfit)
+calc.yhat(lmfit)
