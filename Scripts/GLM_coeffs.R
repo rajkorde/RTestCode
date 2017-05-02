@@ -205,14 +205,19 @@ p_male_hons = 17/74
 
 OR = p_female_hons/p_male_hons
 
+RR <- (32/(32+77))/(17/(17+74))
+
 logodds_female_male = log(p_female_hons/p_male_hons)
 
 glmfac = glm(hon ~ female, d, family = binomial(link = "logit"))
 
 all.equal(logodds_female_male, tidy(glmfac)$estimate[2])
 
-control <- exp(-1.4709 ) / (1+ exp(-1.4709 ))
-exp(0.5928) / (1-control + control * exp(0.5928))
+intercept <- glmfac$coefficients[1]
+female_coeff <- glmfac$coefficients[2]
+
+control <- exp(intercept) / (1 + exp(intercept ))
+exp(female_coeff) / (1 - control + control * exp(female_coeff))
 
 #LR with 1 continuos variable
 glmcont = glm(hon ~ math, d, family = binomial(link = "logit"))
