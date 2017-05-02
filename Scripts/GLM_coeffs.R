@@ -1,5 +1,5 @@
 
-
+library(ggplot2)
 prob <- seq(.01, .99, length = 100)
 
 odds <- prob/(1-prob)
@@ -175,7 +175,7 @@ ggplot(d, aes(prob, odds)) + geom_line()
 
 #http://www.ats.ucla.edu/stat/mult_pkg/faq/general/odds_ratio.htm
 #interpreting coefficients
-d <- read.csv(file = "Data/glmsample.csv", header = TRUE)
+d <- read.csv(file = "http://stats.idre.ucla.edu/wp-content/uploads/2016/02/sample.csv", header = TRUE)
 dim(d)
 head(d)
 summary(d)
@@ -203,11 +203,16 @@ xtabs(~ hon + female, d)
 p_female_hons = 32/77
 p_male_hons = 17/74
 
+OR = p_female_hons/p_male_hons
+
 logodds_female_male = log(p_female_hons/p_male_hons)
 
 glmfac = glm(hon ~ female, d, family = binomial(link = "logit"))
 
 all.equal(logodds_female_male, tidy(glmfac)$estimate[2])
+
+control <- exp(-1.4709 ) / (1+ exp(-1.4709 ))
+exp(0.5928) / (1-control + control * exp(0.5928))
 
 #LR with 1 continuos variable
 glmcont = glm(hon ~ math, d, family = binomial(link = "logit"))
@@ -338,13 +343,8 @@ X2 <- rnorm(N,  30, 8)
 X3 <- abs(rnorm(N, 60, 30))
 X3fac <- cut(X3, breaks=c(-Inf, quantile(X3, c(0.25, 0.5, 0.75)), Inf), 
              labels=c("vlo", "lo", "hi", "vhi"))
-Y  <- 0.5*X1 - 0.3*X2 - 1.0 * as.numeric(X3fac) + 10 + rnorm(N, 0, 12)
-lmfit <- lm(Y ~ X1 + X2 + X3fac)
-summary(lmfit)
-vif(lmfit)
-
-X3fac2 <- relevel(X3fac, ref = "hi")
-Y  <- 0.5*X1 - 0.3*X2 - 1.0 * as.numeric(X3fac2) + 10 + rnorm(N, 0, 12)
+X3fac2 <- relevel(X3fac, ref = "vhi")
+Y  <- 0.5*X1 - 0.3*X2 - 2.0 * as.numeric(X3fac2) + 10 + rnorm(N, 0, 12)
 lmfit <- lm(Y ~ X1 + X2 + X3fac2)
 summary(lmfit)
 vif(lmfit)
