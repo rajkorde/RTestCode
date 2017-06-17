@@ -52,3 +52,53 @@ mc<-fitMarkovChain(cls)
 startPattern<-new("Pattern", sequence=c("h", "c"))
 predict(mc, startPattern)
 plot(mc)
+
+
+# clickclust v2
+library(ClickClust)
+data("synth", package = "ClickClust")
+
+repl.levs <- function(x, ch.lev) {
+  for (j in 1:length(ch.lev)) x <- gsub(ch.levs[j], j, x)
+  return(x)
+}
+
+d <- paste(synth$data, collapse = " ")
+d <- strsplit(d, " ")[[1]]
+ch.levs <- levels(as.factor(d))
+
+S <- strsplit(synth$data, " ")
+S <- sapply(S, repl.levs, ch.levs)
+S <- sapply(S, as.numeric)
+
+C <- click.read(S)
+set.seed(123)
+N2 <- click.EM(X = C$X, K = 2)
+
+#Mmgraphr
+library(MmgraphR)
+trmat<-matrix( c (0.1, 0.05, 0.05, 0.80,
+                  0.06, 0.02, 0.03, 0.89,
+                  0.03, 0.01, 0.01, 0.95,
+                  0, 0, 0, 1), nrow = 4, ncol = 4, byrow = TRUE)
+trmatplot(trmat)
+trmatplot(trmat, seed = 2, cspal = "dynamic")
+trmatplot(trmat, seed = 2, pfilter = "smax")
+trmatplot(trmat, seed = 2, pfilter = "tmin", num = 10)
+
+# weighted cluster
+library(WeightedCluster)
+data(mvad)
+aggMvad <- wcAggregateCases(mvad[, 17:86])
+print(aggMvad)
+
+
+uniqueMvad <- mvad[aggMvad$aggIndex, 17:86]
+
+
+mvad.seq <- seqdef(uniqueMvad, weights = aggMvad$aggWeights)
+diss <- seqdist(mvad.seq, method = "HAM")
+
+averageClust <- hclust(as.dist(diss), method = "average", members = aggMvad$aggWeights)
+averageTree <- as.seqtree(averageClust, seqdata = mvad.seq, diss = diss, ncluster = 6)
+seqtreedisplay(averageTree, type = "d", border = NA, showdepth = TRUE)
