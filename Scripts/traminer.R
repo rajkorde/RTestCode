@@ -149,3 +149,21 @@ discrseq <- seqecmpgroup(df.subseq, group = df.feat$sex)
 head(discrseq)
 plot(discrseq[1:10], cex=1.5)
 plot(discrseq[1:10], ptype="resid", cex=1.5)
+
+#event sequencing
+library(TraMineR)
+data(mvad)
+mvad.alphabet <- c("employment", "FE", "HE", "joblessness", "school", 
+                   "training")
+mvad.labels <- c("employment", "further education", "higher education", 
+                 "joblessness", "school", "training")
+mvad.scodes <- c("EM", "FE", "HE", "JL", "SC", "TR")
+mvad.seq <- seqdef(mvad, 17:86, alphabet = mvad.alphabet, states = mvad.scodes, 
+                   labels = mvad.labels, xtstep = 6)
+
+mvad.seqe <- seqecreate(mvad.seq, use.labels = FALSE)
+fsubseq <- seqefsub(mvad.seqe, pmin.support = 0.05)
+plot(fsubseq[1:15], col = "cyan")
+
+discr <- seqecmpgroup(fsubseq, group = mvad$male)
+plot(discr[1:6])

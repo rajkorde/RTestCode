@@ -102,3 +102,45 @@ diss <- seqdist(mvad.seq, method = "HAM")
 averageClust <- hclust(as.dist(diss), method = "average", members = aggMvad$aggWeights)
 averageTree <- as.seqtree(averageClust, seqdata = mvad.seq, diss = diss, ncluster = 6)
 seqtreedisplay(averageTree, type = "d", border = NA, showdepth = TRUE)
+
+#http://blog.revolutionanalytics.com/2016/01/getting-started-with-markov-chains.html
+library(expm)
+library(markovchain)
+library(diagram)
+library(pracma)
+
+
+A <- c("Start", "Cortana", "Action", "Edge")
+d <- sample(A, 100, replace = TRUE, prob = c(0.5, 0.3, 0.1, 0.1))
+
+library(markovchain)
+
+sequenceMatr <- createSequenceMatrix(d, sanitize = FALSE)
+mcX<-markovchainFit(d)
+mcFitMLE <- markovchainFit(data = d)
+mcFitBSP <- markovchainFit(data = d, method = "bootstrap", nboot = 5, name = "Bootstrap Mc")
+
+plotmat(markovchainFit(xChar))
+
+Oz <- matrix(c(0.10000000, 0.2000000, 0.1000000, 0.6000000,
+              0.03125000, 0.3750000, 0.0312500, 0.5625000,
+              0.30000000, 0.3000000, 0.2000000, 0.2000000,
+              0.08510638, 0.3191489, 0.1276596, 0.4680851),
+             nrow=4, byrow=TRUE)
+row.names(Oz) <- A; colnames(Oz) <- A
+plotmat(Oz,pos = c(2,2), 
+        lwd = 1, box.lwd = 2, 
+        cex.txt = 0.8, 
+        box.size = 0.1, 
+        box.type = "circle", 
+        box.prop = 0.5,
+        box.col = "light yellow",
+        arr.length=.1,
+        arr.width=.1,
+        self.cex = .4,
+        self.shifty = -.01,
+        self.shiftx = .13,
+        main = "")
+
+Oz3 <- Oz %^% 3
+round(Oz3,3)
