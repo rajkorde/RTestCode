@@ -1,11 +1,7 @@
-library(jsonlite)
+library(CosmosToR)
+vc <- vc_connection('https://cosmos11.osdinfra.net/cosmos/asimov.partner.osg/')
 
-d <- readLines("D:/Temp/AFSDump-11142017/11142017/AFSDump_AAD_156044517231.27.json")
+streamPath <- "/shares/asimov.prod.data/PublicPartner/Processed/WXaaS/MAD_DAD/Daily/2018/05/01/Win10/osEngagement_2018-05-01.ss"
 
-library(qdapTools)
-x <- fromJSON(d[1])
-y <- stack(x)
+data1 <- ss_all(vc, streamPath)
 
-for line in d {
-#  x <- bind_rows(x, fromJSON(line))
-}
