@@ -31,3 +31,4 @@ vignettes/*.pdf
 *.RDataTmp
 *.feather
 *.hdf5
+*.rda
